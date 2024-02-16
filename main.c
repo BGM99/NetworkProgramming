@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <string.h>
 #include "daytimeprt.h"
 
 int printHostIp(const char *hostName);
@@ -10,7 +11,11 @@ int main(int argc, char *argv[]) {
 
     //err = printHostIp("localhost");
 
-    err = startDayTimePrt(argc, argv);
+    if (!strcmp(argv[1], "server")){
+        err = startDayTimePrtServer(argc, argv);
+    } else {
+        err = startDayTimePrtClient(argc, argv);
+    }
 
     return err;
 }

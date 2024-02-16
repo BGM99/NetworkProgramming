@@ -45,7 +45,7 @@ void connectToHostname(char *hostname, int *connection_socket, char *port_number
     fprintf(stderr, "Couldn't connect to %s", hostname);
 }
 
-int startDayTimePrt(int argc, char **argv) {
+int startDayTimePrtClient(int argc, char **argv) {
     int fd;
     int n;
     char buff[MAXLINE];
@@ -55,7 +55,7 @@ int startDayTimePrt(int argc, char **argv) {
         return -1;
     }
 
-    connectToHostname(argv[1], &fd, "13");
+    connectToHostname(argv[1], &fd, "1111");
 
     while ((n = read(fd, buff, MAXLINE)) > 0) {
         buff[n] = 0;        /* null terminate */
@@ -64,4 +64,32 @@ int startDayTimePrt(int argc, char **argv) {
     close(fd);
 
     return 1;
+}
+
+int startDayTimePrtServer(int argc, char **argv) {
+    int listenfd, connfd;
+    struct sockaddr_in servaddr;
+    char buff[MAXLINE];
+    time_t ticks;
+
+    listenfd = socket(AF_INET, SOCK_STREAM, 0);
+
+    bzero(&servaddr, sizeof(servaddr));
+    servaddr.sin_family      = AF_INET;
+    servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    servaddr.sin_port        = htons(1111);	/* daytime server */
+
+    bind(listenfd, (const struct sockaddr *) &servaddr, sizeof(servaddr));
+
+    listen(listenfd, BACKLOG);
+
+    while (1) {
+        connfd = accept(listenfd, (struct sockaddr *) NULL, NULL);
+
+        ticks = time(NULL);
+        snprintf(buff, sizeof(buff), "%.24s\r\n", ctime(&ticks));
+        write(connfd, buff, strlen(buff));
+
+        close(connfd);
+    }
 }
