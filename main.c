@@ -3,6 +3,7 @@
 #include <netdb.h>
 #include <string.h>
 #include "daytimeprt.h"
+#include "echoprt.h"
 
 int printHostIp(const char *hostName);
 
@@ -11,11 +12,13 @@ int main(int argc, char *argv[]) {
 
     //err = printHostIp("localhost");
 
-    if (!strcmp(argv[1], "server")){
-        err = startDayTimePrtServer(argc, argv);
-    } else {
-        err = startDayTimePrtClient(argc, argv);
-    }
+    //if (!strcmp(argv[1], "server")){
+    //    err = startDayTimePrtServer(argc, argv);
+    //} else {
+    //    err = startDayTimePrtClient(argc, argv);
+    //}
+
+    err = startEchoPrtServer(argc, argv);
 
     return err;
 }
@@ -33,4 +36,3 @@ int printHostIp(const char *hostName) {
 
     return err;
 }
-
