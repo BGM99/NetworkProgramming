@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
     //    err = startDayTimePrtClient(argc, argv);
     //}
 
-    err = startEchoPrtServer(argc, argv);
+    err = startEchoMultiProcessServer(argc, argv);
 
     return err;
 }
