@@ -5,6 +5,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <sys/wait.h>
 #include "webserver.h"
 
 #define MAXLINE 4096
@@ -57,5 +58,7 @@ int startHttpGetServer(int argc, char **argv) {
 
         close(fd);
         close(connfd);
+        int err;
+        waitpid(pid, &err, 0); //clean up child process
     }
 }
