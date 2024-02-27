@@ -5,6 +5,7 @@
 #include "daytimeprt.h"
 #include "webserver.h"
 #include "echoprt.h"
+#include "chat.h"
 
 int printHostIp(const char *hostName);
 
@@ -13,13 +14,11 @@ int main(int argc, char *argv[]) {
 
     //err = printHostIp("localhost");
 
-    //if (!strcmp(argv[1], "server")){
-    //    err = startDayTimePrtServer(argc, argv);
-    //} else {
-    //    err = startDayTimePrtClient(argc, argv);
-    //}
-
-    err = startHttpGetServer(argc, argv);
+    if (strcmp(argv[1], "server") == 0) {
+        startChatServer(argc, argv);
+    } else if (strcmp(argv[1], "client") == 0) {
+        startChatClient(argc, argv);
+    }
 
     return err;
 }
