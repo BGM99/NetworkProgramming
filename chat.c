@@ -4,28 +4,17 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <pthread.h>
-#include "chat.h"
 #include <stdlib.h>
+#include "chat.h"
 
 #define BUFFER 50
 #define BACKLOG 10
 #define MAX_CLIENTS 10
 
-
-void printSockAddrIn(const struct sockaddr_in *sockAddr) {
-    char ipAddr[INET_ADDRSTRLEN];
-    inet_ntop(AF_INET, &(sockAddr->sin_addr), ipAddr, INET_ADDRSTRLEN);
-
-    printf("IP: %s\n", ipAddr);
-    printf("Port: %d\n", ntohs(sockAddr->sin_port));
-}
-
-
 int startChatClient(int argc, char *argv[]) {
+    struct sockaddr_in server;
 
     int connfd = socket(AF_INET, SOCK_STREAM, 0);
-
-    struct sockaddr_in server;
 
     if (inet_pton(AF_INET, argv[2], &server.sin_addr) <= 0) {
         fprintf(stderr, "Invalid IP address: %s\n", argv[2]);
@@ -34,10 +23,10 @@ int startChatClient(int argc, char *argv[]) {
     server.sin_family = AF_INET;
     server.sin_port = htons(atoi(argv[3]));
 
-    printSockAddrIn(&server);
-
     if (connect(connfd, (struct sockaddr *) &server, sizeof(server)) < 0) {
         printf("Connection to given IP address failed. \n");
+    } else {
+        printf("Successfully connected to IP address. \n");
     }
 
     int n;
@@ -45,7 +34,7 @@ int startChatClient(int argc, char *argv[]) {
 
     while (pid == 0) { //child
         char buff[BUFFER];
-        //read and print MSG from Server
+
         if ((n = read(connfd, buff, BUFFER)) > 0) {
             buff[n] = 0;        /* null terminate */
             printf("%s\n", buff);
@@ -74,10 +63,9 @@ void *serveClient(void *arg) {
     int clientFd = params->clientFD;
 
     int n;
+    char buff[BUFFER];
 
     while (1) {
-        char buff[BUFFER];
-
         if ((n = read(clientFd, buff, BUFFER)) > 0) {
             for (int i = 0; i < size; ++i) {
                 int conn = openConnections[i];
@@ -116,6 +104,8 @@ int startChatServer(int argc, char *argv[]) {
 
     if (listen(listenfd, BACKLOG) < 0) {
         printf("Changing the socket to listen mode failed!");
+    } else {
+        printf("Server is running!\n");
     }
 
     while (1) {
@@ -134,7 +124,7 @@ int startChatServer(int argc, char *argv[]) {
                 .clientFD = clientfd
         };
 
-        pthread_t listenThread;
-        pthread_create(&listenThread, NULL, serveClient, (void *) &params);
+        pthread_t serveThread;
+        pthread_create(&serveThread, NULL, serveClient, (void *) &params);
     }
 }
